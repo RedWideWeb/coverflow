@@ -20,8 +20,10 @@ html {
 }
 
 body {
+  -webkit-touch-callout: none; /* holding to see the version must not open a callout */
   font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -webkit-user-select: none;
   user-select: none;
 }
 
@@ -54,8 +56,6 @@ body {
 .covers {
   position: absolute;
   inset: 0;
-  perspective: var(--perspective);
-  perspective-origin: 50% var(--horizon);
 }
 
 .cover {
@@ -122,10 +122,37 @@ body {
   color: var(--hint);
 }
 
+/* Revealed by holding anywhere; fades in quickly, dissolves slowly. */
+.version {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(6px + env(safe-area-inset-bottom));
+  margin: 0;
+  z-index: 20001;
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: #b4b4ba;
+  opacity: 0;
+  transition: opacity 700ms ease-out;
+  pointer-events: none;
+}
+
+.version.is-visible {
+  opacity: 1;
+  transition-duration: 160ms;
+}
+
 /* Keyboard tips mean nothing on phones and tablets. */
 @media (hover: none) and (pointer: coarse) {
   .hint {
     display: none;
+  }
+
+  /* Sit above Safari's floating bottom toolbar. */
+  .version {
+    bottom: calc(64px + env(safe-area-inset-bottom));
   }
 }
 

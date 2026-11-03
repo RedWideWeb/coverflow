@@ -10,6 +10,9 @@
   const START_INDEX = 10; // "1 coin": covers on both sides to start with
   const MAX_FRAME_DT = 1 / 20; // s; avoids a jump after a backgrounded tab
   const RELEASE_LOOKAHEAD = 0.08; // s of momentum carried past a released scrub
+  const VERSION = 'v0.7';
+  const LONG_PRESS_MS = 550; // hold this long anywhere to reveal the version
+  const VERSION_LINGER_MS = 1500; // stays this long after lifting, then dissolves
   const reducedMotion = root.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const DEFAULTS = Object.freeze({
@@ -33,6 +36,24 @@
   let heldArrows = new Set();
   let drag = null;
   let wheelTimer = 0;
+  let longPressTimer = 0;
+  let longPressed = false;
+  let versionTimer = 0;
+
+  const versionEl = stage.querySelector('.version');
+  versionEl.textContent = `Prototype ${VERSION}`;
+
+  function showVersion() {
+    longPressed = true;
+    root.clearTimeout(versionTimer);
+    versionEl.classList.add('is-visible');
+  }
+
+  function dissolveVersion() {
+    if (!longPressed) return;
+    root.clearTimeout(versionTimer);
+    versionTimer = root.setTimeout(() => versionEl.classList.remove('is-visible'), VERSION_LINGER_MS);
+  }
 
   const tuner = createTuner({
     container: document.body,
@@ -151,12 +172,16 @@
     releaseHold();
     root.clearTimeout(wheelTimer);
     drag = gesture.startDrag(x, t, phys.pos);
+    longPressed = false;
+    root.clearTimeout(longPressTimer);
+    longPressTimer = root.setTimeout(showVersion, LONG_PRESS_MS);
     wake();
   }
 
   function onDragMove(x, t) {
     if (!drag) return;
     drag = gesture.moveDrag(drag, x, t, config.gesture);
+    if (!gesture.isTap(drag, config.gesture)) root.clearTimeout(longPressTimer);
     wake();
   }
 
@@ -166,9 +191,12 @@
     if (!drag) return;
     const ended = gesture.moveDrag(drag, x, t, config.gesture);
     drag = null;
+    root.clearTimeout(longPressTimer);
+    dissolveVersion();
     const position = gesture.dragPosition(ended, dragPx(), items.length, config.gesture);
     if (gesture.isTap(ended, config.gesture)) {
-      const cover = hit && hit.closest('.cover');
+      // A hold that revealed the version is not also a tap on a cover.
+      const cover = !longPressed && hit && hit.closest('.cover');
       nav = navigation.jump(nav, cover ? Number(cover.dataset.index) : clampIndex(position));
       wake();
       return;

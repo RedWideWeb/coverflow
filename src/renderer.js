@@ -1,8 +1,12 @@
 /*
  * DOM renderer. Every cover is absolutely positioned at the stage centre and
- * placed with translate3d/rotateY under the parent's CSS perspective; paint
- * order comes from z-index rather than preserve-3d depth sorting, which keeps
- * Safari and Chrome identical.
+ * placed with perspective()/translate3d/rotateY. Each cover's transform-origin
+ * is the centre of its art, which is the same screen point for all of them,
+ * so a per-cover perspective() equals one shared camera with its vanishing
+ * point on the horizon. (A parent `perspective-origin` was ignored by Safari
+ * on real iPhones in portrait: the vanishing point fell to mid-screen and the
+ * covers' bottom edges went flat.) Paint order comes from z-index rather than
+ * preserve-3d depth sorting, which keeps Safari and Chrome identical.
  */
 (function (root) {
   'use strict';
@@ -95,13 +99,13 @@
       stage.style.setProperty('--cover-height', `${(size * (1 + REFLECTION_LENGTH)).toFixed(1)}px`);
       stage.style.setProperty('--cover-top', `${coverTop}px`);
       stage.style.setProperty('--horizon', `${horizon}px`);
-      stage.style.setProperty('--perspective', `${(cameraDistance * size).toFixed(1)}px`);
       stage.style.setProperty('--caption-top', `${Math.round(coverTop + size * (1 + CAPTION_GAP))}px`);
       stage.style.setProperty('--caption-font', `${(size * CAPTION_FONT).toFixed(1)}px`);
     }
 
     function placeCovers(position, pose, cameraDistance) {
       const { size } = metrics;
+      const camera = `perspective(${(cameraDistance * size).toFixed(1)}px)`;
       covers.forEach((cover, index) => {
         const offset = index - position;
         const p = layout.coverPose(offset, pose);
@@ -112,7 +116,7 @@
         cover.style.visibility = 'visible';
         cover.style.zIndex = String(layout.paintOrder(offset));
         cover.style.transform =
-          `translate3d(${(p.x * size).toFixed(2)}px, 0, ${(p.z * size).toFixed(2)}px) ` +
+          `${camera} translate3d(${(p.x * size).toFixed(2)}px, 0, ${(p.z * size).toFixed(2)}px) ` +
           `rotateY(${p.rotateY.toFixed(3)}deg)`;
       });
     }

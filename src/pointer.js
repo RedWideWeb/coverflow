@@ -42,6 +42,13 @@
     stage.addEventListener('pointerup', end);
     stage.addEventListener('pointercancel', end);
 
+    // Android long-press menu; a mouse right-click never starts a drag, so it
+    // keeps its menu. (iOS's long-press loupe is stopped in CSS instead:
+    // preventDefault on touchstart would also swallow iOS pointer events.)
+    stage.addEventListener('contextmenu', (event) => {
+      if (activeId !== null) event.preventDefault();
+    });
+
     stage.addEventListener(
       'wheel',
       (event) => {
