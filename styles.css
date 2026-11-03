@@ -1,0 +1,237 @@
+:root {
+  --ink: #2a2a2c;
+  --ink-soft: #3c3c40;
+  --hint: #8d8d93;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+/* Light studio backdrop from the video: grey above, a bright glossy floor
+   just under the covers, falling off toward the bottom and the sides. */
+.stage {
+  position: fixed;
+  inset: 0;
+  outline: none;
+  cursor: grab;
+  touch-action: none; /* the flow handles horizontal drags itself */
+  -webkit-tap-highlight-color: transparent;
+  background:
+    radial-gradient(120% 70% at 50% 62%, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0) 60%),
+    linear-gradient(
+      to bottom,
+      #cfd0d4 0%,
+      #e4e5e8 calc(var(--horizon) * 0.6),
+      #f1f1f2 var(--horizon),
+      #fafafa calc(var(--horizon) + var(--cover-size) * 0.55),
+      #ececee 88%,
+      #d9dadd 100%
+    );
+}
+
+.stage.is-dragging {
+  cursor: grabbing;
+}
+
+.covers {
+  position: absolute;
+  inset: 0;
+  perspective: var(--perspective);
+  perspective-origin: 50% var(--horizon);
+}
+
+.cover {
+  position: absolute;
+  left: calc(50% - var(--cover-size) / 2);
+  top: var(--cover-top);
+  width: var(--cover-size);
+  height: var(--cover-size);
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
+.cover__art,
+.cover__reflection img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  -webkit-touch-callout: none;
+}
+
+/* Mirror on the floor, touching the cover's bottom edge and fading out over
+   roughly half a cover. It lives inside the cover so it turns with it. */
+.cover__reflection {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.42) 0%, rgba(0, 0, 0, 0.12) 30%, rgba(0, 0, 0, 0) 58%);
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.42) 0%, rgba(0, 0, 0, 0.12) 30%, rgba(0, 0, 0, 0) 58%);
+}
+
+.cover__reflection img {
+  transform: scaleY(-1);
+}
+
+.caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: var(--caption-top);
+  z-index: 20000;
+  pointer-events: none;
+}
+
+.caption__item {
+  position: absolute;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: var(--caption-font);
+  line-height: 1.2;
+  opacity: 0;
+  transition: opacity 160ms ease-out;
+}
+
+.caption__item.is-active {
+  opacity: 1;
+}
+
+.caption__title {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.caption__artist {
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 18px;
+  margin: 0;
+  z-index: 20000;
+  text-align: center;
+  font-size: 12px;
+  color: var(--hint);
+}
+
+/* Keyboard tips mean nothing on phones and tablets. */
+@media (hover: none) and (pointer: coarse) {
+  .hint {
+    display: none;
+  }
+}
+
+.hint kbd {
+  display: inline-block;
+  min-width: 1.4em;
+  padding: 1px 4px;
+  margin: 0 1px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.6);
+  font: inherit;
+  text-align: center;
+}
+
+/* Tuning panel */
+.tuner {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 30000;
+  width: 300px;
+  max-height: calc(100vh - 24px);
+  overflow-y: auto;
+  padding: 10px 12px 12px;
+  border-radius: 12px;
+  background: rgba(250, 250, 252, 0.82);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  backdrop-filter: blur(18px) saturate(1.4);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15), 0 0 0 0.5px rgba(0, 0, 0, 0.12);
+  font-size: 11px;
+  color: #1d1d1f;
+  user-select: auto;
+}
+
+.tuner[hidden] {
+  display: none;
+}
+
+.tuner__title {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.tuner__readout {
+  margin: 0 0 8px;
+  font: 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: #555;
+}
+
+.tuner__group {
+  margin: 0 0 8px;
+  padding: 4px 0 0;
+  border: 0;
+  border-top: 0.5px solid rgba(0, 0, 0, 0.12);
+}
+
+.tuner__group legend {
+  padding: 0 4px 0 0;
+  font-weight: 600;
+  color: #6e6e73;
+}
+
+.tuner__row {
+  display: grid;
+  grid-template-columns: 1fr 110px 38px;
+  align-items: center;
+  gap: 6px;
+  min-height: 20px;
+}
+
+.tuner__row input[type="checkbox"] {
+  justify-self: start;
+}
+
+.tuner__row:has(input[type="checkbox"]) {
+  grid-template-columns: auto 1fr;
+}
+
+.tuner__value {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  color: #555;
+}
+
+.tuner__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.tuner__actions button {
+  flex: 1;
+  padding: 4px 8px;
+  border: 0.5px solid rgba(0, 0, 0, 0.18);
+  border-radius: 6px;
+  background: #fff;
+  font: inherit;
+  cursor: pointer;
+}

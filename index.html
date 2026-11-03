@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cover Flow prototype</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main id="stage" class="stage" tabindex="0" aria-label="Cover Flow. Use the left and right arrow keys, drag, or scroll to browse.">
+      <div class="covers"></div>
+      <div class="caption" aria-live="off"></div>
+      <p class="hint">
+        <kbd>←</kbd><kbd>→</kbd> step &nbsp;·&nbsp; hold to scrub &nbsp;·&nbsp; <kbd>⇧</kbd>+<kbd>←</kbd><kbd>→</kbd> flick
+        &nbsp;·&nbsp; <kbd>Home</kbd>/<kbd>End</kbd> &nbsp;·&nbsp; drag or scroll &nbsp;·&nbsp; <kbd>T</kbd> tune
+      </p>
+    </main>
+
+    <script src="src/layout.js"></script>
+    <script src="src/motion.js"></script>
+    <script src="src/navigation.js"></script>
+    <script src="src/gesture.js"></script>
+    <script src="src/items.js"></script>
+    <script src="src/renderer.js"></script>
+    <script src="src/tuner.js"></script>
+    <script src="src/pointer.js"></script>
+    <script src="src/app.js"></script>
+  </body>
+</html>
