@@ -63,34 +63,17 @@ body {
   left: calc(50% - var(--cover-size) / 2);
   top: var(--cover-top);
   width: var(--cover-size);
-  height: var(--cover-size);
-  transform-origin: 50% 50%;
+  height: var(--cover-height); /* art plus its floor reflection, one canvas */
+  transform-origin: 50% calc(var(--cover-size) / 2); /* centre of the art */
   will-change: transform;
 }
 
-.cover__art,
-.cover__reflection img {
+.cover__art {
   display: block;
   width: 100%;
   height: 100%;
   pointer-events: none;
   -webkit-touch-callout: none;
-}
-
-/* Mirror on the floor, touching the cover's bottom edge and fading out over
-   roughly half a cover. It lives inside the cover so it turns with it. */
-.cover__reflection {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.42) 0%, rgba(0, 0, 0, 0.12) 30%, rgba(0, 0, 0, 0) 58%);
-  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.42) 0%, rgba(0, 0, 0, 0.12) 30%, rgba(0, 0, 0, 0) 58%);
-}
-
-.cover__reflection img {
-  transform: scaleY(-1);
 }
 
 .caption {
